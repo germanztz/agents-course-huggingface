@@ -1,0 +1,4 @@
+# requirements.txt
+
+smolagents[telemetry]
+smolagents[litellm]
