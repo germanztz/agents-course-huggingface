@@ -1,6 +1,12 @@
-from smolagents import CodeAgent, DuckDuckGoSearchTool, FinalAnswerTool, HfApiModel, Tool, tool, VisitWebpageTool
+from smolagents import CodeAgent, DuckDuckGoSearchTool, FinalAnswerTool, HfApiModel, Tool, tool, VisitWebpageTool, LiteLLMModel
 from llama_index.embeddings.ollama import OllamaEmbedding
 import ollama
+from phoenix.otel import register
+from openinference.instrumentation.smolagents import SmolagentsInstrumentor
+
+register(project_name="smolagents-local" )
+SmolagentsInstrumentor().instrument()
+
 
 @tool
 def suggest_menu(occasion: str) -> str:
@@ -68,15 +74,13 @@ class OllamaModel:
         self.model_name = model_name
 
     def __call__(self, prompt, stop_sequences=["Task"]):
-        print("here")
-        print(prompt)
         # Use Ollama's generate or chat API to handle prompts
         response = ollama.chat(model=self.model_name, messages=[{"role": "user", "content": prompt}])
         return response['message']['content']
 
 # Initialize the agent with OllamaModel
-ollama_model = OllamaModel(model_name="llama3.1:8b-instruct-q3_K_S")
-
+# ollama_model = OllamaModel(model_name="llama3.1:8b-instruct-q3_K_S")
+ollama_model = LiteLLMModel(model_id="ollama_chat/llama3.1:8b-instruct-q3_K_S", api_base="http://localhost:11434" )
 # Alfred, the butler, preparing the menu for the party
 agent = CodeAgent(
     tools=[
@@ -88,7 +92,9 @@ agent = CodeAgent(
     ], 
     model=ollama_model,
     max_steps=10,
-    verbosity_level=2
+    verbosity_level=2,
+    additional_authorized_imports=['requests','re', 'itertools', 'collections', 'stat', 'random', 'statistics', 'math', 'unicodedata', 'datetime', 'time', 'queue'],
 )
+
 
 agent.run("Give me the best playlist for a party at the Wayne's mansion. The party idea is a 'villain masquerade' theme")
