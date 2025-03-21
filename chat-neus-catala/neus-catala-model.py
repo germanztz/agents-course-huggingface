@@ -21,6 +21,7 @@ import os
 from dotenv import load_dotenv
 import glob
 import PyPDF2
+import json
 
 # Load environment variables from .env file
 load_dotenv()
@@ -68,10 +69,10 @@ def digest_pdf(pdf_file: str) -> str:
     pdf_reader = PyPDF2.PdfReader(pdf_file)
     text = ''
     for page in pdf_reader.pages:
-        text += page.extract_text()
+        text += "\n"+page.extract_text()
 
     text = clean_text(text)
-    file_path = DATA_PATH + 'digest/' + os.path.basename(pdf_file) + '.txt'
+    file_path = DATA_PATH + 'digest/' + os.path.basename(pdf_file)[:-4]
     # white text in a file named after the pdf in the digest folder
     with open(file_path, 'w') as f:
         f.write(text)    
@@ -102,21 +103,22 @@ async def embed_files(new_files):
             ],
             vector_store=vector_store,
         )
-        nodes = await pipeline.arun(documents=documents)
+        nodes = await pipeline.arun(documents=documents, show_progress=True)
     except Exception as e:
         print(f"Error: {e})")
 
 async def process_new_files():
     pdf_files = glob.glob(DATA_PATH + 'documents/*.pdf')
-    # print('New files',pdf_files)
-    digested_files = glob.glob(DATA_PATH + 'digest/*.txt')
+
+    digested_files = glob.glob(DATA_PATH + 'digest/*')
     # get the filename of the digested files no extension, no path
-    digested_files = [os.path.basename(file).split('.')[0] for file in digested_files]
-    # print('Digested files',digested_files)
-    new_files = [file for file in pdf_files if os.path.basename(file).split('.')[0] not in digested_files]
-    # print('New files',new_files)
-    print('digested files',new_files)
-    await embed_files(new_files)
+    digested_files = [os.path.basename(file) for file in digested_files]
+
+    # filter the pdf files to only include those that are not in the digested_files list
+    pdf_files = [file for file in pdf_files if os.path.basename(file).split('.')[0] not in digested_files]
+
+    print('digested files',pdf_files)
+    await embed_files(pdf_files)
 
 
 index = VectorStoreIndex.from_vector_store(
@@ -141,6 +143,7 @@ query_engine_agent = AgentWorkflow.from_tools_or_functions(
 evaluator = FaithfulnessEvaluator(llm=llm)
 
 
+
 async def answer_question():
     tests = [
         {"question": "Que havien de passar Les presoneres de Ravensbrück abans d incorporar-se als treballs forçats?", "Correct response": "Quarentena."},
@@ -157,17 +160,17 @@ async def answer_question():
     ]
 
     for test in tests:
-        question_str = f'respond in calatan, in less than 5 words: {test["question"]}'
-        print('\n\n**********Question:************\n',question_str, 'Response:',test['Correct response'])
+        question_str = f'Answer to the question allwais Using less than 5 words, in catalan language. The question: {test["question"]}'
+        print('\n**Question:',question_str, '(',test['Correct response'],')**')
 
         # test['default_response'] = await llm.apredict(PromptTemplate(question_str))
         test['default_response'] = llm.complete(question_str)
         
-        print('*Default response:',test['default_response'])
+        print('\tDefault response:',test['default_response'])
 
         nest_asyncio.apply()  # This is needed to run the query engine
         test['informed_response'] = query_engine.query(question_str)
-        print('*Informed response:',test['informed_response'])
+        print('\tInformed response:',test['informed_response'])
 
         # handler = query_engine_agent.run(question)
 
@@ -188,8 +191,46 @@ async def answer_question():
 
         # print dict questions table formated
 
-asyncio.run(process_new_files())
+def get_collection_files():
+    return list(set( m['file_name'] for m in chroma_collection.get(include=['metadatas'])['metadatas']))
 
-asyncio.run(answer_question())
+def manage_colection():
+    print('*Chroma collection size:', chroma_collection.count())
+    # print(json.dumps(chroma_collection.get(where_document = {"$contains": "Francisco Serrano"}, limit=2), indent=4))
+    print('*Chroma collection files:',get_collection_files())
 
+    
+
+def chat_console():
+    print("Bienvenido a la consola de chat. Escribe '/bye' para terminar la sesión.")
+    
+    chat_engine = index.as_chat_engine(llm=llm)
+
+    while True:
+        # Leer la entrada del usuario
+        user_input = input("Tú: ")
+        
+        # Salir del chat si el usuario escribe 'salir'
+        if user_input.lower() == '/bye':
+            print("Cerrando la consola de chat. ¡Hasta luego!")
+            break
+        
+        chat_engine.astream_chat(user_input)
+        # Recuperar nodos relevantes del vector store
+        nodes_with_scores = retriever.retrieve(user_input)
+        
+        # Procesar y mostrar la respuesta
+        if nodes_with_scores:
+            # Aquí simplemente mostramos el texto del nodo con la puntuación más alta
+            best_node = nodes_with_scores[0].node
+            print(f"Bot: {best_node.text}")
+        else:
+            print("Bot: Lo siento, no encontré información relevante.")
+
+
+if __name__ == '__main__':
+
+    asyncio.run(process_new_files())
+    manage_colection()
+    asyncio.run(answer_question())
 
