@@ -22,3 +22,5 @@ Ideal for local AI-driven automation and research. 🚀
     sudo apt install python3.11 python3.11-venv 
     python3.11 -m ensurepip --default-pip
     python3.11 -m pip install --upgrade pip
+    python3.11 -m venv .venv
+    source venv/bin/activate

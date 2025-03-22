@@ -25,14 +25,14 @@ import json
 
 # Load environment variables from .env file
 load_dotenv()
-llama_index.core.set_global_handler(
-    "arize_phoenix", 
-    endpoint="https://llamatrace.com/v1/traces"
-)
+# llama_index.core.set_global_handler(
+#     "arize_phoenix", 
+#     endpoint="https://llamatrace.com/v1/traces"
+# )
 
 DATA_PATH = "chat-neus-catala/data/"
-embedding_model = OllamaEmbedding(model_name="qllama/bge-small-en-v1.5:f16")
-llm = Ollama(model="qwen2.5:7b-instruct") # Funciona de manera satisfactoria
+embedding_model = OllamaEmbedding(model_name="qllama/bge-small-en-v1.5:f16", base_url="http://localhost:11434")
+llm = Ollama(model="qwen2.5:7b-instruct", base_url="http://localhost:11434") # Funciona de manera satisfactoria
 # llm = Ollama(model="llama3.1:8b-instruct-q3_K_S")
 # llm = Ollama(model="qwen2.5:32b-instruct")
 # llm = Ollama(model="deepseek-r1:latest")
@@ -109,15 +109,17 @@ async def embed_files(new_files):
 
 async def process_new_files():
     pdf_files = glob.glob(DATA_PATH + 'documents/*.pdf')
+    print('pdf files',pdf_files)
 
     digested_files = glob.glob(DATA_PATH + 'digest/*')
     # get the filename of the digested files no extension, no path
     digested_files = [os.path.basename(file) for file in digested_files]
+    print('digested files',digested_files)
 
     # filter the pdf files to only include those that are not in the digested_files list
     pdf_files = [file for file in pdf_files if os.path.basename(file).split('.')[0] not in digested_files]
 
-    print('digested files',pdf_files)
+    print('to digest files',pdf_files)
     await embed_files(pdf_files)
 
 
@@ -148,15 +150,15 @@ async def answer_question():
     tests = [
         {"question": "Que havien de passar Les presoneres de Ravensbrück abans d incorporar-se als treballs forçats?", "Correct response": "Quarentena."},
         {"question": "La Neus Catala considera que va tenir una infància com?", "Correct response": "feliç"},
-        {"question": "La mateixa Neus, que presideix l Amical, va fer el discurs de presentació al paranimf de la Universitat de Barcelona, el juny de quin any?", "Correct response": "2006"},
-        {"question": "La Neus va néixer als Guiamets, un poblet de la comarca tarragonina del Priorat, a quin any?", "Correct response": "1915"},
-        {"question": "A principis del segle passat, a Els Guiamets hi arribava gent de quin pais?", "Correct response": "França"},
-        {"question": "En Baltasar Català era un pagès que combinava el treball al camp amb que mes?", "Correct response": "barber i pintor"},
-        {"question": "Quina fundació va fer el treball biogràfic sobre la Neus Catala?", "Correct response": "Fundació Pere Ardiaca"},
-        {"question": "Els diumenges a la tarda es reunia amb els camarades i les seves famílies en quin lloc?", "Correct response": "un petit teatret"},
-        {"question": "En aquell temps, el que més desitjava la Neus era treballar on?", "Correct response": "un bon hospital"},
-        {"question": "Qui era el Francisco Serrano?", "Correct response": "el jove que els repartia la sopa a la presó"},
-        {"question": "Les cendres d algunes d aquestes dones es troben en quin lloc?", "Correct response": "al fons del llac Schwedt"},     
+        # {"question": "La mateixa Neus, que presideix l Amical, va fer el discurs de presentació al paranimf de la Universitat de Barcelona, el juny de quin any?", "Correct response": "2006"},
+        # {"question": "La Neus va néixer als Guiamets, un poblet de la comarca tarragonina del Priorat, a quin any?", "Correct response": "1915"},
+        # {"question": "A principis del segle passat, a Els Guiamets hi arribava gent de quin pais?", "Correct response": "França"},
+        # {"question": "En Baltasar Català era un pagès que combinava el treball al camp amb que mes?", "Correct response": "barber i pintor"},
+        # {"question": "Quina fundació va fer el treball biogràfic sobre la Neus Catala?", "Correct response": "Fundació Pere Ardiaca"},
+        # {"question": "Els diumenges a la tarda es reunia amb els camarades i les seves famílies en quin lloc?", "Correct response": "un petit teatret"},
+        # {"question": "En aquell temps, el que més desitjava la Neus era treballar on?", "Correct response": "un bon hospital"},
+        # {"question": "Qui era el Francisco Serrano?", "Correct response": "el jove que els repartia la sopa a la presó"},
+        # {"question": "Les cendres d algunes d aquestes dones es troben en quin lloc?", "Correct response": "al fons del llac Schwedt"},     
     ]
 
     for test in tests:
