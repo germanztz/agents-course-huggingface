@@ -11,17 +11,18 @@ from llama_index.core import VectorStoreIndex
 from llama_index.core.tools import QueryEngineTool
 from llama_index.core.prompts import PromptTemplate
 from llama_index.core.evaluation import FaithfulnessEvaluator
+from llama_index.core.schema import TransformComponent
+
 import nest_asyncio
 import pandas as pd
-
 import chromadb
-
 import asyncio
 import os
 from dotenv import load_dotenv
 import glob
 import PyPDF2
 import json
+import re
 
 # Load environment variables from .env file
 load_dotenv()
@@ -42,46 +43,62 @@ db = chromadb.PersistentClient(path=DATA_PATH + 'neus_catala.db')
 chroma_collection = db.get_or_create_collection(name="neus_catala")
 vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
 
-#regex to clean double new lines
-import re
+# #regex to clean double new lines
 rx_nl = re.compile(r'(\n\s*\n)')
 rx_hyphen = re.compile(r'(-\n)')
 rx_notdot = re.compile(r'(?<!\.)\n')
 rx_num_leter = re.compile(r'(\d)([a-zA-Z])')
 
-def clean_text(text: str) -> str:
-    text = rx_nl.sub('\n', text)
-    text = rx_hyphen.sub('', text)
-    text = rx_notdot.sub(' ', text)
-    text = rx_num_leter.sub(r'\1 \2', text)
-    return text
+class TextCleaner(TransformComponent):
 
-def digest_pdf(pdf_file: str) -> str:
-    """
-    Returns the text content of a PDF file.
+    # rx_nl: re.Pattern = re.compile(r'(\n\s*\n)')
+    # rx_hyphen: re.Pattern  = re.compile(r'(-\n)')
+    # rx_notdot: re.Pattern  = re.compile(r'(?<!\.)\n')
+    # rx_num_leter: re.Pattern  = re.compile(r'(\d)([a-zA-Z])')
 
-    Parameters:
-    pdf_file (str): The path to the PDF file.
+    def __call__(self, nodes, **kwargs):
+        # nodes = list(map(lambda node: TextCleaner()(node), nodes))
+        for node in nodes:
+            text = rx_nl.sub('\n', node.text)
+            text = rx_hyphen.sub('', text)
+            text = rx_notdot.sub(' ', text)
+            text = rx_num_leter.sub(r'\1 \2', text)   
+            node.set_content(text)
+        return nodes
 
-    Returns:
-    str: The text content of the PDF file.
-    """
-    pdf_reader = PyPDF2.PdfReader(pdf_file)
-    text = ''
-    for page in pdf_reader.pages:
-        text += "\n"+page.extract_text()
+# def clean_text(text: str) -> str:
+#     text = rx_nl.sub('\n', text)
+#     text = rx_hyphen.sub('', text)
+#     text = rx_notdot.sub(' ', text)
+#     text = rx_num_leter.sub(r'\1 \2', text)
+#     return text
 
-    text = clean_text(text)
-    file_path = DATA_PATH + 'digest/' + os.path.basename(pdf_file)[:-4]
-    # white text in a file named after the pdf in the digest folder
-    with open(file_path, 'w') as f:
-        f.write(text)    
+# def digest_pdf(pdf_file: str) -> str:
+#     """
+#     Returns the text content of a PDF file.
+
+#     Parameters:
+#     pdf_file (str): The path to the PDF file.
+
+#     Returns:
+#     str: The text content of the PDF file.
+#     """
+#     pdf_reader = PyPDF2.PdfReader(pdf_file)
+#     text = ''
+#     for page in pdf_reader.pages:
+#         text += "\n"+page.extract_text()
+
+#     text = clean_text(text)
+#     file_path = DATA_PATH + 'digest/' + os.path.basename(pdf_file)[:-4]
+#     # white text in a file named after the pdf in the digest folder
+#     with open(file_path, 'w') as f:
+#         f.write(text)    
     
-    print(f'{file_path} length:',len(text))
-    return file_path
+#     print(f'{file_path} length:',len(text))
+#     return file_path
 
-def digest_pdf_list(pdf_files: list) -> list:
-    return [digest_pdf(pdf_file) for pdf_file in pdf_files]
+# def digest_pdf_list(pdf_files: list) -> list:
+#     return [digest_pdf(pdf_file) for pdf_file in pdf_files]
 
 async def embed_files(new_files):
     if new_files is None or len(new_files) == 0:
@@ -89,14 +106,18 @@ async def embed_files(new_files):
         return
 
     try:
-        new_files = digest_pdf_list(new_files)
+        # new_files = digest_pdf_list(new_files)
 
-        reader = SimpleDirectoryReader(input_files=new_files)
+        # reader = SimpleDirectoryReader(input_files=new_files)
+        input_dir = DATA_PATH + 'documents/'
+        
+        reader = SimpleDirectoryReader(input_dir=input_dir)
         documents = reader.load_data()
         # print('Documents',documents)
-
+        
         pipeline = IngestionPipeline(
             transformations=[
+                # TextCleaner(),
                 SentenceSplitter(chunk_size=200),
                 # TokenTextSplitter(chunk_size=512),
                 embedding_model
@@ -109,17 +130,17 @@ async def embed_files(new_files):
 
 async def process_new_files():
     pdf_files = glob.glob(DATA_PATH + 'documents/*.pdf')
-    print('pdf files',pdf_files)
+    # print('pdf files',pdf_files)
 
-    digested_files = glob.glob(DATA_PATH + 'digest/*')
-    # get the filename of the digested files no extension, no path
-    digested_files = [os.path.basename(file) for file in digested_files]
-    print('digested files',digested_files)
+    # digested_files = glob.glob(DATA_PATH + 'digest/*')
+    # # get the filename of the digested files no extension, no path
+    # digested_files = [os.path.basename(file) for file in digested_files]
+    # print('digested files',digested_files)
 
-    # filter the pdf files to only include those that are not in the digested_files list
-    pdf_files = [file for file in pdf_files if os.path.basename(file).split('.')[0] not in digested_files]
+    # # filter the pdf files to only include those that are not in the digested_files list
+    # pdf_files = [file for file in pdf_files if os.path.basename(file).split('.')[0] not in digested_files]
 
-    print('to digest files',pdf_files)
+    # print('to digest files',pdf_files)
     await embed_files(pdf_files)
 
 
