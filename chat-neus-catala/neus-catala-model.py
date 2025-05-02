@@ -25,6 +25,7 @@ import json
 import re
 
 # Load environment variables from .env file
+from dotenv import load_dotenv
 load_dotenv()
 # llama_index.core.set_global_handler(
 #     "arize_phoenix", 
@@ -33,6 +34,7 @@ load_dotenv()
 
 DATA_PATH = "chat-neus-catala/data/"
 embedding_model = OllamaEmbedding(model_name="qllama/bge-small-en-v1.5:f16", base_url="http://localhost:11434")
+from llama_index.llms.ollama import Ollama 
 llm = Ollama(model="qwen2.5:7b-instruct", base_url="http://localhost:11434") # Funciona de manera satisfactoria
 # llm = Ollama(model="llama3.1:8b-instruct-q3_K_S")
 # llm = Ollama(model="qwen2.5:32b-instruct")
