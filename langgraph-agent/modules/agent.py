@@ -13,7 +13,16 @@ from tools.file_operations import read_file, write_file
 from tools.bash_executor import execute_bash
 from config import AgentConfig
 
+from langfuse.callback import CallbackHandler
+# load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
+# Initialize Langfuse CallbackHandler for LangGraph/Langchain (tracing) https://cloud.langfuse.com
+langfuse_handler = CallbackHandler() 
+
 config = AgentConfig()
+
 
 # Define the state
 class AgentState(TypedDict):
@@ -113,7 +122,7 @@ def run_agent(query: str, chat_history: List[BaseMessage] = None) -> Tuple[Any, 
     }
     
     # Run the graph
-    result = graph.invoke(state)
+    result = graph.invoke(state, config={"callbacks": [langfuse_handler]})
     
     # Return the result
     return result["agent_outcome"], result["chat_history"]
