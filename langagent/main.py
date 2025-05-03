@@ -30,7 +30,7 @@ def main() -> None:
     """Main function to run the agent."""
     parser = argparse.ArgumentParser(description="LangGraph Agent with Ollama Qwen3")
     parser.add_argument("--query", "-q", type=str, help="Query for the agent")
-    parser.add_argument("--interactive", "-i", action="store_true", help="Run in interactive mode")
+    parser.add_argument("--interactive", "-i", action="store_true", help="Run in interactive mode", default=True)
     parser.add_argument("--session", "-s", type=str, help="Session ID for conversation persistence")
     
     args = parser.parse_args()
@@ -46,7 +46,13 @@ def main() -> None:
     # Load chat history if it exists (not implemented - would need DB)
     chat_history: List[BaseMessage] = []
     
-    if args.interactive:
+    if args.query:
+        human_message = HumanMessage(content=args.query)
+        chat_history.append(human_message)
+        
+        result, chat_history = run_agent(args.query, chat_history)
+        display_message(chat_history[-1])
+    else:
         print("🤖 LangGraph Agent with Ollama Qwen3")
         print("Type 'exit' or 'quit' to exit the program")
         print("-" * 80)
@@ -61,12 +67,6 @@ def main() -> None:
             
             result, chat_history = run_agent(query, chat_history)
             display_message(chat_history[-1])
-    else:
-        human_message = HumanMessage(content=args.query)
-        chat_history.append(human_message)
-        
-        result, chat_history = run_agent(args.query, chat_history)
-        display_message(chat_history[-1])
 
 if __name__ == "__main__":
     main()
