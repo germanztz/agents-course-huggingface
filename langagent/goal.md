@@ -13,23 +13,24 @@ The Manager is responsible for managing the execution of tasks by LangAgent. It 
 
 - Understands the user’s request.
 - **Deep dive**: Checks with the user for confirmation and clarification.
-- Assigns the Analyst Agent to analyze the request.
+- Assigns the Analist Agent to analyze the request.
 - Starts the execution graph.
 - Produces documentation:
     - `README.md`
 - Tools:
   - `file operations`: File operations such as list, reading, writing, deleting, etc.
+- Next step: **Analist** : Calls the `Analist` and asks for the analisis.
 
 ### 2. Analist
 
-The Analyst Agent is responsible for analyzing the requirements and scope of the project, identifying potential issues, and suggesting solutions. It also helps in defining the architecture and platform of the project.
+The Analist Agent is responsible for analyzing the requirements and scope of the project, identifying potential issues, and suggesting solutions. It also helps in defining the architecture and platform of the project.
 
-- **Understand the project**: The Analyst Agent reads the `README.md` file and analyzes its content, identifying potential issues and suggesting solutions.
+- **Understand the project**: Reads the project documentation, identifying the different modules based on the featues.
+  - `README.md`
 - **Research**: For each feature will search in internet to find documentation about libraries needed and existing examples. will digest and embed this information obtained in the internet in a vector db stores inside the project. This documentation about tools, libraries, tools, etc. will be used by the `PM` for further analysis and for the `Developer`.
 - **Ask for clarification**: Present the alternatives to chose the architecture, platform, scope, requeriments, etc. and the questions to clarify the plan and register the answers of the user, then redefine the summary and the moduleswith the final information.
-Then, generates a list and description of the key elements and modules needed to achieve the goal. Also a list of alternetives or questions about the architecture, platform, scope, requeriments, etc. the agent also suggests a summary of the project. 
-Key modules needed: `Data collection`, `Report generation`, `Document parsing`, etc., Alternatives: `Use a database to store data`, `Use an API to fetch data`.
-- **Project structure**: The Analyst creates a project structure based on the requirements and scope of the project. It also defines the architecture and platform of the project and stores that information in files.
+Then, generates a list and description of the key elements and modules needed to achieve the goal. Also a list of alternetives or questions about the architecture, platform, scope, requeriments, etc. the agent also suggests a summary of the project. for example: Key modules needed: `Data collection`, `Report generation`, `Document parsing`, etc., Alternatives: `Use a database to store data`, `Use an API to fetch data`.
+- **Project structure**: The Analist creates a project structure based on the requirements and scope of the project. It also defines the architecture and platform of the project and stores that information in files.
 - Produces documentation:
   - `docs/modules.md`: List of modules needed for the project.
   - `docs/architecture.md`: Description of the architecture of the project.
@@ -37,6 +38,7 @@ Key modules needed: `Data collection`, `Report generation`, `Document parsing`, 
   - `file operations`: File operations such as list, reading, writing, deleting, etc.
   - `internet search`: Search for information online.
   - `web scraping`: Extract data from websites.
+- Next steps: **Manager**: Returs to the `Manager` indicating that the analyst has been completed.
 
 
 ### 3. PM
@@ -44,46 +46,48 @@ Key modules needed: `Data collection`, `Report generation`, `Document parsing`, 
 The Project Manager is responsible for managing the project and ensuring that it meets the requirements. It will be responsible for creating a detailed plan.
 The Project Manager will also be responsible for monitoring the progress of the project and reporting any issues or delays to the team.
 
-- **Understand the project**: Read all the files in the project structure created by the other agents and extract a deep understanding of the meaning, the goal, tools, needs, requeriments, structures, arquitecture, means etc of the project.
+- **Understand the project**: Read all the files in the project structure created by the other agents and extract a deep understanding of the meaning, the goal, tools, needs, requeriments, structures, architecture, means etc of the project.
 - **Project plan**: Based on the information extracted, create a detailed plan for the project. The plan should include all the necessary steps and tasks required to achieve the goal.
 - **DoD**: Define the DoD (Definition of Done) for the project. This will include all the criteria that must be met to consider the tasks complete, depending on the type of project (e.g., software development, data analysis, etc.).; The tests specified in the documentation, etc. This section of the file will be used by the `Developer`.
 - Produces documentation:
-  - `docs/planing.md`: Detailed plan for the project.
+  - `docs/planning.md`: Detailed plan for the project.
 - Tools:
   - `file operations`: File operations such as list, reading, writing, deleting, etc.
+- Next steps: **Manager**: Returs to the `Manager` indicating that the planning has been created.
 
 
 ### 4. Developer
 
-The Developer agent is responsible for implementing the tasks outlined in the project plan. They will work closely with the IA agents to ensure that all tasks are completed correctly and efficiently. They will also work closely with the IA agents to ensure that all tasks are completed correctly and efficiently. For every task the agent has to undertand the project as a whole defined in `Readme.md`, stick to the architecture defined on `docs/architecture.md`, the modules defined in `dosc/modules.md`, 
+The Developer agent is responsible for implementing the tasks outlined in the project plan. They will work closely with the IA agents to ensure that all tasks are completed correctly and efficiently. They will also work closely with the IA agents to ensure that all tasks are completed correctly and efficiently. For every task the agent has to undertand the project as a whole defined in `Readme.md`, stick to the architecture defined on `docs/architecture.md`, the modules defined in `docs/modules.md`, 
 
-- **Understand the project**: The Developer agent should understand the project as a whole defined in `Readme.md`, stick to the architecture defined on `docs/architecture.md`, the modules defined in `dosc/modules.md`.
+- **Understand the project**: The Developer agent should understand the project as a whole defined in `Readme.md`, stick to the architecture defined on `docs/architecture.md`, the modules defined in `docs/modules.md`.
+- **Select the task**: The Developer agent should select the next pending task.
 - **Undestand the task**: 
-- **Implement the task**: Implement the task according to the requeriments specified in the task description, and the DoD section.
+- **Implement the task**: Implement the task according to the requeriments specified in the task description.
 - **Test the task**: 
 - **Update the status**: The Developer agent should update the status of each task based on their analysis and test results.
+- Produces documentation:
+  - `docs/planning.md`: Updates the planning document to reflect the current state of the task.
+- Tools:
+  - `file operations`: File operations such as list, reading, writing, deleting, etc.
+  - `internet search`: Search for information online.
+  - `web scraping`: Extract data from websites.
+- Next steps: **PM**: Returs to the `PM` indicating that the task is completed.
 
 ## LangAgent Workflow
 
 1. **Definition**: The user invoques the `Manager` by providing a prompt with a first aproach of what they want, for example: "`Create an application that generates an status report of a project based on documents of a folder`".
 1. **Deep dive**: the `Manager` has to figure out all the details of the project, in order to do that, it engages in a conversation with the user, asking them about the project's requirements, scope, and architecture. Until all the details are gathered or the user ask to stop asking, For example: `Will the app be running locally in a PC?`, `The report has to be sended via email?`. 
-1. **Project details**: the `Manager` shows a sumary of the project and ask the user for confimation, then, stores in a file `README.md` the details of the project. This file will be used by th `Analist` and the `PM` for a deeply understanding of the project. The file needs to have the following structure:
-1. **Call the analist**: The `Manager` then calls the analist and asigns the task of reading the README.md file
+1. **Project details**: the `Manager` shows a sumary of the project and ask the user for confimation, then, stores in a file `README.md` the details of the project. 
+1. **Call the Analist**: The `Manager` then calls the `Analist` 
 1. **Call the Project Manager**: The `Manager` then calls the `PM` and assigns the task of reading all the files and create a plan to implement the project.
-
-1. **Read the README.md file**: The `Analyst` reads the README.md file and analyzes its content, identifying potential issues and suggesting solutions.
-1. **Research**: For each module and feature The `Analyst` will search in internet to find documentation about libraries needed and existing examples. will digest and embed this information obtained in the internet in a vector db stores inside the project. This documentation about tools, libraries, tools, etc. will be used by the `PM` for further analysis and for the `Developer`.
-1. **Ask for clarification**: Present the alternatives to chose the architecture, platform, scope, requeriments, etc. and the questions to clarify the plan and register the answers of the user, then redefine the summary and the modules and the plan with the final information.
-Then, generates a list and description of the key elements and modules needed to achieve the goal. Also a list of alternetives or questions about the architecture, platform, scope, requeriments, etc. the agent also suggests a summary of the project. 
-Key modules needed: `Data collection`, `Report generation`, `Document parsing`, etc., Alternatives: `Use a database to store data`, `Use an API to fetch data`.
-1. **Project structure**: The `Analyst` creates a project structure based on the requirements and scope of the project. It also defines the architecture and platform of the project and stores that information in files.
-  - **docs/modules.md**: This file lists all the modules that will be implemented in the project. contains the description of any part of the aplication.
-  - **docs/architecture.md**: This file describes the architecture and platform of the project. this file needs to have this information:
-1. **Read md files**: Read all the markdown files in the project directory created by the other agents and extract a deep understanding of the meaning, the goal, tools, needs, requeriments, structures, arquitecture, means etc of the project.
-1. **Project plan**: Based on the information extracted from the markdown files, create a detailed plan for the project. The plan should include all the necessary steps and tasks required to achieve the goal. The plan is stored in a file named `planning.md` with the following seccions:
-- **DoD**: Define the DoD (Definition of Done) for the project. This will include all the criteria that must be met to consider the project complete. This will include all the criteria that must be met to consider the project complete, depending on the type of project (e.g., software development, data analysis, etc.).; The tests specified in the documentation, etc. This section of the file will be used by the `Developer` to ensure thar every task is completed according to the DoD.
-- **Execution Plan**: A detailed plan of tasks to be executed, each task with its own description and dependencies
-
+1. **Understand the project**: The `Analist` reads the `README.md`, identifying potential issues and suggesting solutions.
+1. **Research**: For each feature, The `Analist` will search in internet to find documentation about libraries needed and existing examples. will digest and embed this information obtained in the internet in a vector db stores inside the project. This documentation about tools, libraries, tools, etc. will be used by the `PM` for further analysis and for the `Developer`.
+1. **Deep dive**: Present the alternatives to chose the architecture, platform, scope, requeriments, etc. and the questions to clarify the plan and register the answers of the user, then redefine the summary and the modules and the plan with the final information.
+1. **Project structure**: The `Analist` creates a project structure based on the requirements and scope of the project. It also defines the architecture and platform of the project and stores in the `docs` directory.
+1. **Understand the project**: The `PM` Read all the files in the project directory created by the other agents and extract a deep understanding of the meaning, the goal, tools, needs, requeriments, structures, architecture, means etc of the project.
+1. **Project plan**: Based on the information extracted from the markdown files, create a detailed plan for the project. The plan should include all the necessary steps and tasks required to achieve the goal. The plan is stored in a file named `docs/planning.md` with the following seccions:
+1. **Plan Execution**: A detailed plan of tasks to be executed, each task with its own description and dependencies
 
 ## Files structure
 
@@ -92,9 +96,9 @@ Key modules needed: `Data collection`, `Report generation`, `Document parsing`, 
 - **Project Name**: The name of the project, for example: `Enterprise reporter`
 - **Description**: A detailed description of the project, it's scope, limitations, public, goals
 - **Project files**: A list of files that will be used by the app, each file contains this information at least:
-  - **Modules**: see file `docs/modules.md`
-  - **Architecture**: @see file `docs/architecture.md`
-  - **Planing**: see file `docs/planning.md`
+  - **Modules**: the link to the file `docs/modules.md`
+  - **Architecture**: the link to the file `docs/architecture.md`
+  - **planning**: the link to the file `docs/planning.md`
 - **Project structure**: Tree list of all directories and files in the project, and a brief description of each directory or file, For example: `docs/ - The documentation files are used to provide information about the project and its components.`
 
 - **Features**: A list of features that the project will have, a feature is a requirement accepted by the user that the app will have to fulfill. each feature contains this information at least:
@@ -106,7 +110,7 @@ Key modules needed: `Data collection`, `Report generation`, `Document parsing`, 
 This file lists all the modules that will be implemented in the project. contains the description of any part of the aplication.
 - **Module name**: The name of the module, for example: `Data collection`
 - **Description**: A detailed description of this module, it's intended use, for example: `Collect all the data from different sources and store it in a centralized database`
-- **Dependencies**: A list of dependencies that the module will have, for example: `pandas`, `numpy`, matplotlib, etc.
+- **Dependencies**: A list of dependencies that the module will have, for example: `pandas`, `numpy`, `matplotlib`, etc.
 
 ### `docs/architecture.md`
 

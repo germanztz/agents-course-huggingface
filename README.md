@@ -23,4 +23,4 @@ Ideal for local AI-driven automation and research. 🚀
     python3.11 -m ensurepip --default-pip
     python3.11 -m pip install --upgrade pip
     python3.11 -m venv .venv
-    source venv/bin/activate
+    source .venv/bin/activate
