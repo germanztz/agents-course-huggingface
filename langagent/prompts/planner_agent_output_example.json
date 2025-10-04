@@ -1,0 +1,8 @@
+{ 
+  "topic": "How to build a Multi-Agent Deep Research System", 
+  "questions": [ 
+    { "question": "What are the key architectural frameworks and design patterns for developing multi-agent systems that integrate deep learning techniques?" }, 
+    { "question": "What technical components (e.g., agent communication protocols, reward mechanisms, or neural network architectures) are essential for implementing a multi-agent deep research system?" }, 
+    { "question": "What challenges arise when combining multi-agent systems with deep learning, and how can they be mitigated?" } 
+  ] 
+}

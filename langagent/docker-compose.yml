@@ -10,6 +10,11 @@ services:
       - LANGFLOW_DATABASE_URL=postgresql://langflow:langflow@postgres:5432/langflow
       # This variable defines where the logs, file storage, monitor data and secret keys are stored.
       - LANGFLOW_CONFIG_DIR=app/langflow
+      - DO_NOT_TRACK=true
+      # This variable defines the secret key used for LangFuse.
+      - LANGFUSE_SECRET_KEY=sk-lf-d28f10a7-e2ca-40fd-9bd8-25e1a5167d37
+      - LANGFUSE_PUBLIC_KEY=pk-lf-3ba6618a-5a28-4e91-a927-44f8fcd43bc6
+      - LANGFUSE_HOST=https://cloud.langfuse.com
     volumes:
       - langflow-data:/app/langflow
 

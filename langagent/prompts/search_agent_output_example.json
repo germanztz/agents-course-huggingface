@@ -1,0 +1,37 @@
+{
+  "questions": [
+    {
+      "question": "What are the key architectural frameworks and design patterns for developing multi-agent systems that integrate deep learning techniques?",
+      "results": [
+        {
+          "url": "https://medium.com/@aydinKerem/ai-agents-design-patterns-explained-b3ac0433c915",
+          "title": "AI Agents Design Patterns Explained | by Kerem Aydın - Medium",
+          "content": "In this article, we explored the evolving landscape of AI agents and their design patterns, highlighting how agentic frameworks have democratized the development of complex AI systems. By discussing foundational concepts and practical implementations like the ReAct pattern, we demonstrated that simpler, cost-effective architectures can often solve specific tasks efficiently. We also examined advanced multi-agent systems, planning agents, and reflection frameworks that enhance AI capabilities.",
+          "summary": "The article discusses AI agents' design patterns, including the ReAct pattern and advanced multi-agent systems, which are crucial for developing complex AI systems with deep learning integration."
+        }
+      ]
+    },
+    {
+      "question": "What technical components (e.g., agent communication protocols, reward mechanisms, or neural network architectures) are essential for implementing a multi-agent deep research system?",
+      "results": [
+        {
+          "url": "https://shchegrikovich.substack.com/p/4-architectures-of-deep-research",
+          "title": "4 Architectures of Deep Research Agents - Shchegrikovich LLM",
+          "content": "In the recent survey paper on the subject of Deep Research, four architectures were proposed: monolithic, pipeline-based, multi-agent and hybrid (combines elements from the previous 3). All of these architecture types consist of the same components: Foundation Model, Task Planning, Tools and API Integrations, Web Browsing, State Management (Memory), Source Evaluation (Validation, Fact Checking), and Output Generation. The difference is how these components are integrated and who controls the [...] Image 11\n\nA Comprehensive Survey of Deep Research: Systems, Methodologies, and Applications\n\nThe Multi-agent architecture consists of several agents that collaborate to produce the final answer. They all connected via a message bus and use separate memory instances. The execution flow here is fully dynamic and based on the Agents' specialisations. This architecture requires an Agent Coordination Layer.\n\nImage 12\n\nA Comprehensive Survey of Deep Research: Systems, Methodologies, and Applications",
+          "summary": "The article discusses the multi-agent architecture for deep research systems, highlighting essential components such as Foundation Models, Task Planning, Tools and API Integrations, Web Browsing, State Management (Memory), Source Evaluation, and Output Generation. It emphasizes the use of a message bus for communication between agents and the need for an Agent Coordination Layer."
+        }
+      ]
+    },
+    {
+      "question": "What challenges arise when combining multi-agent systems with deep learning, and how can they be mitigated?",
+      "results": [
+        {
+          "url": "https://milvus.io/ai-quick-reference/what-are-the-challenges-of-designing-multiagent-systems",
+          "title": "What are the challenges of designing multi-agent systems? - Milvus",
+          "content": "What are the challenges of designing multi-agent systems? Why Milvus *   What is Milvus *   What are the challenges of designing multi-agent systems? What are the challenges of designing multi-agent systems? Designing multi-agent systems (MAS) presents several challenges due to the complexity of coordinating multiple autonomous entities. These systems require agents to interact, communicate, and make decisions in shared environments, which introduces issues like coordination overhead, scalability, and handling uncertainty. To address this, developers often implement protocols like contract net (where agents bid for tasks) or publish-subscribe systems. Additionally, privacy concerns arise when agents share sensitive information, requiring techniques like federated learning or secure multi-party computation, which complicate system design and maintenance. Zilliz Cloud is a managed vector database built on Milvus perfect for building GenAI applications.",
+          "summary": "Designing multi-agent systems (MAS) presents challenges like coordination overhead, scalability, and handling uncertainty. These can be addressed with protocols like contract net or publish-subscribe systems, and privacy concerns can be mitigated using techniques like federated learning."
+        }
+      ]
+    }
+  ]
+}

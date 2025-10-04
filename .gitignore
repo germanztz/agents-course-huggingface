@@ -173,3 +173,4 @@ cython_debug/
 2.2-llamaindex/data/
 2.2-llamaindex/alfred_chroma_db/
 chat-neus-catala/data/
+.workspace/

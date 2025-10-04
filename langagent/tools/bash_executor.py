@@ -1,14 +1,6 @@
-"""Tool for executing bash commands."""
-
 import subprocess
-from typing import List, Optional
-from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 
-class BashCommandInput(BaseModel):
-    """Input for bash command execution."""
-    command: str = Field(..., description="Bash command to execute")
-    timeout: Optional[int] = Field(default=60, description="Timeout in seconds for the command")
 
 @tool
 def execute_bash(command: str, timeout: int = 60) -> str:
@@ -20,7 +12,13 @@ def execute_bash(command: str, timeout: int = 60) -> str:
         timeout: Timeout in seconds (default: 60)
         
     Returns:
-        Output of the command (stdout and stderr)
+        Output object of the command 
+        {
+            "command": string,
+            "return code": int,
+            "stdout": string,
+            "stderr": string,
+        }
     """
     try:
         # Run the command
@@ -31,23 +29,25 @@ def execute_bash(command: str, timeout: int = 60) -> str:
             capture_output=True,
             text=True
         )
-        
-        # Prepare the output
-        stdout = result.stdout.strip()
-        stderr = result.stderr.strip()
-        returncode = result.returncode
-        
-        output = f"Command: {command}\n"
-        output += f"Return code: {returncode}\n\n"
-        
-        if stdout:
-            output += f"STDOUT:\n{stdout}\n\n"
-        
-        if stderr:
-            output += f"STDERR:\n{stderr}\n\n"
-        
-        return output
+                
+        return {
+            "command": command,
+            "return code": result.returncode,
+            "stdout": result.stdout.strip(),
+            "stderr": result.stderr.strip(),
+        }
+
     except subprocess.TimeoutExpired:
-        return f"Command timed out after {timeout} seconds: {command}"
+        return {
+            "command": command,
+            "return code": -1,
+            "stdout": None,
+            "stderr": f"Error executing command: Command timed out after {timeout} seconds",
+        }
     except Exception as e:
-        return f"Error executing command: {str(e)}"
+        return {
+            "command": command,
+            "return code": -1,
+            "stdout": None,
+            "stderr": f"Error executing command: {str(e)}",
+        }
