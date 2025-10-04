@@ -2443,7 +2443,7 @@
                 "show": true,
                 "title_case": false,
                 "type": "str",
-                "value": "AIzaSyAMfjfzLU6rbENyHX2fh7_F0gMyMs2gTuE"
+                "value: "xxxxxxxxxxxx"
               },
               "google_cse_id": {
                 "_input_type": "SecretStrInput",
