@@ -8,3 +8,16 @@ llama_index.embeddings.ollama
 llama_index.vector_stores.chroma
 llama-index-callbacks-arize-phoenix
 PyPDF2
+langchain 
+langchain_ollama 
+langchain_mcp_adapters
+dotenv 
+langfuse 
+pandas 
+langgraph 
+mcp 
+bs4
+langchain_community
+duckduckgo_search
+langchain_tavily
+langchain_experimental
