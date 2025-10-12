@@ -1,10 +1,12 @@
 from dotenv import load_dotenv
+from typing import Annotated, List, Dict, Any, Optional
 from mcp.server.fastmcp import FastMCP
 from langchain_core.tools import tool
 from langchain_mcp_adapters.tools import to_fastmcp
 import pandas as pd
 import os
 import json
+import datetime
 
 # load environment variables from .env file
 load_dotenv()
@@ -12,22 +14,22 @@ workfolder = os.getenv('WORKFOLDER')
 projects_df = pd.read_csv(os.path.join(workfolder, "projects.csv"))
 email_reasons_df = pd.read_csv(os.path.join(workfolder, "email_reasons.csv"))
 
+
 @tool
-def send_email(from_email:str, to_email:str, subject:str, body:str) -> str:
-    """ Sends an email. 
-    parameters:
-    from_email (str): The sender's email address.
-    to_email (str): The recipient's email address.
-    subject (str): The subject of the email.
-    body (str): The body of the email.
-    """
+def send_email(from_email: Annotated[str, "The sender's email address."], 
+    to_email:Annotated[str, "The recipient's email address."], 
+    subject:Annotated[str, "The subject of the email."], 
+    body:Annotated[str, "The body of the email."]
+    ) -> Annotated[str, "result message"]:
+    """ Sends an email."""
     try:
-        email = {'from_email': from_email, 'to_email': to_email, 'subject': subject, 'body': body, 'tags': ''}
+        now = datetime.datetime.now()
+        date_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        email = {'date': date_string, 'from_email': from_email, 'to_email': to_email, 'tags': '', 'subject': subject, 'body': body}
         file_path = os.path.join(workfolder, "emails.csv")
         if os.path.exists(file_path):
             emails_df = pd.read_csv(file_path, index_col='id')
             emails_df = pd.concat([emails_df, pd.DataFrame([email])], ignore_index=True)
-            print(file_path)
         else:
             emails_df = pd.DataFrame([email])
 
@@ -38,8 +40,7 @@ def send_email(from_email:str, to_email:str, subject:str, body:str) -> str:
 
 @tool
 def get_emails() -> dict:
-    """ Returns the last email received by the system with empty tags, in json: {'id': 0, 'from_email': '', 'to_email': '', 'subject': '', 'body': '', 'tags': ''}.
-    If no emails with empty tags are found, returns a no new message error.
+    """ Returns the last email received by the system, in json: {'id': 0, 'date': '', 'from_email': '', 'to_email': '', 'tags': '', 'subject': '', 'body': ''}.
     """
     emails_df = pd.read_csv(os.path.join(workfolder, "emails.csv"), index_col='id')
 
@@ -57,17 +58,14 @@ def get_projects() -> dict:
     return projects_df[['tag','name','description']].to_dict( orient="records")
 
 @tool
-def modify_email(email_id: int, tag_string: str) -> str:
-    """ Modifies an email identified by its ID, adding a tag to it.
-    parameters:
-    email_id (int): The ID of the email to tag.
-    tag_string (str): The tag to create.
-    """
+def modify_email(email_id: Annotated[int, "The ID of the email to tag."], 
+    tag_string: Annotated[str, "The tag to create."]
+    ) -> Annotated[str, "result message"]:
+    """ Modifies an email identified by its ID, adding a tag to it."""
     try:
         emails_df = pd.read_csv(os.path.join(workfolder, "emails.csv"), index_col='id')
         tags = emails_df.at[email_id, 'tags'] if pd.notna(emails_df.at[email_id, 'tags']) else ''
         tags = tags.split(',') if len(tags) > 1 else []
-        tags.append(tag_string)
         tags.append(tag_string)
         tags = list(set(tags))
         tags = ','.join(tags)
@@ -94,16 +92,15 @@ tools=[
 mcp = FastMCP("mcp", tools=tools)
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
-
 
     # print(get_projects.invoke(''))
     # print(get_reasons.invoke(''))
     # print('send_email:', send_email.invoke(input={"from_email":"admin@example.com", "to_email":"user@example.com", "subject":"Test Subject", "body":"This is a test email"}))
     # email = get_emails.invoke('')
     # print('get_emails:', email)
-    # print('modify_email:', modify_email.invoke(input={"email_id":email['id'], "tag_string":"test"}))
+    # print('modify_email:', modify_email.invoke(input={"email_id":email['id'], "tag_string":"tag1"}))
     # print('get_emails:', get_emails.invoke(''))
     # print(modify_email.invoke(input={"email_id":email['id'], "tag_string":"tag2"}))
     # print(modify_email.invoke(input={"email_id":email['id'], "tag_string":"tag3"}))
 
+    mcp.run(transport="stdio")
