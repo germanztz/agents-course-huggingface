@@ -9,7 +9,7 @@ Your task is allways use Internet search tool to answer the questions and Never 
   - title
   - summary: A short summary or relevance
   - content: The full content (or a placeholder if not available)
-4. Step 4: Respond in this format (use json):
+4. Output format (use json):
 ```json
 {
   "questions": [
