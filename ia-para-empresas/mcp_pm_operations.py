@@ -53,9 +53,10 @@ def get_emails() -> dict:
         return "No new messages"
 
 @tool 
-def get_projects() -> dict:
-    """ Returns the list of the projects, in json: [{'tag':'','name':'','description':''}] """
-    return projects_df[['tag','name','description']].to_dict( orient="records")
+def get_projects() -> Annotated[List[Dict[str, Any]], "the project list"]:
+    """Returns the list of projects"""
+    projects_df = pd.read_csv(os.path.join(workfolder, "projects.csv"))
+    return projects_df.to_dict( orient="records")
 
 @tool
 def modify_email(email_id: Annotated[int, "The ID of the email to tag."], 
@@ -76,9 +77,9 @@ def modify_email(email_id: Annotated[int, "The ID of the email to tag."],
         return f"email modifying failed {e}"
 
 @tool
-def get_reasons() -> dict:
-    """ Returns the list of reasons for sending an email, in json: [{ 'reason':'','description':'','action':'' }]. 
-    """
+def get_reasons() -> Annotated[List[Dict[str, Any]], "the reasons list"]:
+    """Returns the list of reasons for sending an email"""
+    email_reasons_df = pd.read_csv(os.path.join(workfolder, "email_reasons.csv"))
     return email_reasons_df.to_dict(orient="records")
 
 tools=[
@@ -93,8 +94,8 @@ mcp = FastMCP("mcp", tools=tools)
 
 if __name__ == "__main__":
 
-    # print(get_projects.invoke(''))
-    # print(get_reasons.invoke(''))
+    print(get_projects.invoke(''))
+    print(get_reasons.invoke(''))
     # print('send_email:', send_email.invoke(input={"from_email":"admin@example.com", "to_email":"user@example.com", "subject":"Test Subject", "body":"This is a test email"}))
     # email = get_emails.invoke('')
     # print('get_emails:', email)
@@ -103,4 +104,4 @@ if __name__ == "__main__":
     # print(modify_email.invoke(input={"email_id":email['id'], "tag_string":"tag2"}))
     # print(modify_email.invoke(input={"email_id":email['id'], "tag_string":"tag3"}))
 
-    mcp.run(transport="stdio")
+    # mcp.run(transport="stdio")

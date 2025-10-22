@@ -6,11 +6,10 @@ Este curso es una introducción al uso de la IA en un entrono empresarial
 
 ia-para-empresas/README.md
 
----
+![image](https://agent-bootcamp.vercel.app/agent.gif)
 
 
-# 1.1 Manual de instalación de Ollama en Windows y Linux
-
+# 1.1 Manual de instalación de Ollama
 
 **Ollama** es una herramienta de código abierto que permite ejecutar **modelos de lenguaje grandes (LLM)** de forma **local**, sin conexión a Internet. Soporta modelos como **Llama, Mistral, Gemma, Phi** y **DeepSeek**, entre otros.
 
@@ -126,7 +125,7 @@ sudo rm -rf /usr/local/bin/ollama /etc/systemd/system/ollama.service
 ![image.png](https://storage.googleapis.com/cline_public_images/docs/assets/ollama-model-grab%20(2).gif)
 
 
-# 1.2 Manual de instalación de Codium (VSCodium)
+# 1.2 Manual de instalación de VSCodium
 
 VSCodium es la versión **open source y sin telemetría** de Visual Studio Code.  
 Permite usar las mismas extensiones desde el Marketplace de VS Code y ofrece instaladores en múltiples plataformas.
@@ -221,10 +220,11 @@ yay -S vscodium-bin
 - Las extensiones del Marketplace funcionan de forma idéntica a las de Visual Studio Code.  
 - Para iniciar desde terminal, simplemente ejecuta `codium`.
 
-![image.png](https://alt-gnome.wiki/vscodium/codium_1.gif)
+![image.png](https://www.practicaldatascience.org/_images/anim_debugging_watch.gif)
 
+https://www.practicaldatascience.org/notebooks/PDS_not_yet_in_coursera/20_programming_concepts/20_debugging_in_vscode.html
 
-# 1.3 Manual de Instalación de Python (Windows y Linux)
+# 1.3 Manual de Instalación de Python
 
 Python es un lenguaje de programación versátil, ideal para desarrollo web, ciencia de datos, automatización y aprendizaje automático.  
 A continuación encontrarás los pasos detallados para su instalación en **Windows** y **Linux**.
@@ -335,7 +335,7 @@ Una vez dentro:
 
 ![image.png](https://static.langfuse.com/docs-legacy-gifs/annotation.gif)
 
-# 1.5 Manual: Integrar Gemini 2.0 Flash con LangGraph
+# 1.5 Manual para Integrar modelo Gemini 2.0 Flash
 
 Este manual guía paso a paso la creación de un **proyecto en Google Cloud**, la generación de una **Google API Key** y la configuración de un **agente LangGraph** para usar el modelo **Gemini 2.0 Flash**.
 
