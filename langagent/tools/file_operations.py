@@ -1,21 +1,20 @@
 """Tools for file operations."""
 
-from typing import Annotated, List, Dict, Any, Optional
-from langchain_experimental.utilities import PythonREPL
+from typing import Annotated, List, Dict, Any, Optional, Literal
+# from langchain_experimental.utilities import PythonREPL
 from langchain.tools import tool
 import os
 
 @tool
 def write_file(
+    file_path: Annotated[str, "The full path to the file where content will be written."],
+    mode: Annotated[Literal['w', 'x', 'a'], "Mode in which the file is opened. 'w' for writing, 'x' for creating and writing to a new file, and 'a' for appending"],
     content: Annotated[str, "The content to be written to the file."],
-    file_path: Annotated[str, "The path to the file where content will be written."],
-    append: Annotated[bool, "If True, append to the file; if False, overwrite it."],
     encoding: Annotated[Optional[str], "The encoding of the file."] = 'utf-8'
     ) -> Annotated[str, "Result message."]:
     """Writes text content to a file in append or overwrite mode."""
     try:
-        mode = 'a' if append else 'w'
-        content = '\n'+content if append else content
+        content = '\n'+content if mode == 'a' else content
         with open(file_path, mode, encoding=encoding) as f:
             f.write(content)
         return f"Content successfully written to {file_path}"
@@ -78,23 +77,23 @@ def edit_document(
 
 
 # Warning: This executes code locally, which can be unsafe when not sandboxed
-repl = PythonREPL()
-@tool
-def python_repl_tool(
-    code: Annotated[str, "The python code to execute to generate your chart."],
-):
-    """Use this to execute python code. If you want to see the output of a value,
-    you should print it out with `print(...)`. This is visible to the user."""
-    try:
-        result = repl.run(code)
-    except BaseException as e:
-        return f"Failed to execute. Error: {repr(e)}"
-    return f"Successfully executed:\n```python\n{code}\n```\nStdout: {result}"
+# repl = PythonREPL()
+# @tool
+# def python_repl_tool(
+#     code: Annotated[str, "The python code to execute to generate your chart."],
+# ):
+#     """Use this to execute python code. If you want to see the output of a value,
+#     you should print it out with `print(...)`. This is visible to the user."""
+#     try:
+#         result = repl.run(code)
+#     except BaseException as e:
+#         return f"Failed to execute. Error: {repr(e)}"
+#     return f"Successfully executed:\n```python\n{code}\n```\nStdout: {result}"
 
 if __name__ == "__main__":
 
-    # print(write_file.invoke(input={'content':'this is a test\n', 'file_path':'/tmp4/file.txt', 'append': True}))
-    print(read_file.invoke(input={'file_path':'/home/daimler/workspaces/agents-course-huggingface/.workspace/clients.csv', 'start':5, 'end':8}))
+    print(write_file.invoke(input={'content':'this is a test\n', 'file_path':'/tmp/file.txt', 'mode': 'w'}))
+    print(read_file.invoke(input={'file_path':'/tmp/file.txt', 'start':0, 'end':9998}))
     
     # print(web_scrape("https://docs.langflow.org/components-custom-components"))
     # print(execute_bash.invoke("pwd"))
