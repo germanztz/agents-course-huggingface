@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interactivo - Preguntas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="contenedor">
+        <!-- Pantalla de Quiz -->
+        <div id="pantalla-quiz">
+            <div class="progreso">
+                <div class="progreso-info">
+                    <div class="info-item">
+                        <div class="info-etiqueta">Pregunta</div>
+                        <div class="info-valor"><span id="numero-pregunta">1</span>/8</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-etiqueta">Puntuación</div>
+                        <div class="info-valor"><span id="puntuacion">0</span>/8</div>
+                    </div>
+                </div>
+                <div class="barra-progreso">
+                    <div class="barra-progreso-llena" id="barra-progreso" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="pregunta-contenedor">
+                <div class="pregunta-texto" id="pregunta-texto">Cargando pregunta...</div>
+                <div class="opciones" id="opciones">
+                    <div class="opcion-placeholder">Cargando opciones...</div>
+                </div>
+            </div>
+
+            <div id="explicacion" class="hidden explicacion">
+                <div class="explicacion-titulo">Explicación:</div>
+                <div id="texto-explicacion"></div>
+            </div>
+
+            <div class="botones">
+                <button class="btn btn-siguiente hidden" id="btn-siguiente" onclick="siguientePregunta()">
+                    Siguiente Pregunta
+                </button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Resultados -->
+        <div id="pantalla-resultados" class="hidden pantalla-resultados">
+            <div class="encabezado">
+                <h1>🎉 Quiz Completado</h1>
+            </div>
+            <div class="resultado-puntuacion" id="resultado-puntuacion">0/8</div>
+            <div class="resultado-porcentaje" id="resultado-porcentaje">0%</div>
+            <div class="resultado-mensaje" id="resultado-mensaje"></div>
+            <div class="resultado-detalles">
+                <p id="resultado-detalles"></p>
+            </div>
+            <button class="btn-reiniciar" onclick="reiniciarQuiz()">Intentar de Nuevo</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
+    <script src="{{ url_for('static', filename='quiz.js') }}"></script>
+</body>
+</html>

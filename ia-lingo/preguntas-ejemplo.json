@@ -1,0 +1,90 @@
+[
+  {
+    "pregunta": "¿Cuál es el lenguaje de programación más utilizado en 2025?",
+    "opciones": [
+      "Python",
+      "JavaScript",
+      "Java",
+      "C++"
+    ],
+    "respuesta_correcta": 0,
+    "explicacion": "Python se ha consolidado como el lenguaje más utilizado debido a su versatilidad en IA, análisis de datos, desarrollo web y automatización."
+  },
+  {
+    "pregunta": "¿Qué significa SQL?",
+    "opciones": [
+      "Structured Query Language",
+      "System Query Logic",
+      "Secure Quick Link",
+      "Software Quality Level"
+    ],
+    "respuesta_correcta": 0,
+    "explicacion": "SQL (Structured Query Language) es el lenguaje estándar para gestionar y consultar bases de datos relacionales."
+  },
+  {
+    "pregunta": "¿Cuál es el framework más popular para desarrollo web en Python?",
+    "opciones": [
+      "Django",
+      "Flask",
+      "FastAPI",
+      "Todos son igualmente populares"
+    ],
+    "respuesta_correcta": 0,
+    "explicacion": "Django es el framework más completo y popular para desarrollo web en Python, aunque Flask es más ligero y FastAPI es el más moderno."
+  },
+  {
+    "pregunta": "¿Qué es una API?",
+    "opciones": [
+      "Una interfaz que permite que diferentes aplicaciones se comuniquen entre sí",
+      "Un tipo de base de datos",
+      "Un lenguaje de programación",
+      "Un servidor web"
+    ],
+    "respuesta_correcta": 0,
+    "explicacion": "Una API (Application Programming Interface) es un conjunto de protocolos y herramientas que permite a las aplicaciones comunicarse e intercambiar datos de forma estandarizada."
+  },
+  {
+    "pregunta": "¿Cuál es la complejidad temporal del algoritmo de búsqueda binaria?",
+    "opciones": [
+      "O(1)",
+      "O(n)",
+      "O(log n)",
+      "O(n²)"
+    ],
+    "respuesta_correcta": 2,
+    "explicacion": "La búsqueda binaria tiene una complejidad temporal de O(log n) porque divide el espacio de búsqueda a la mitad en cada iteración, lo que la hace muy eficiente."
+  },
+  {
+    "pregunta": "¿Qué es un bucket en AWS S3?",
+    "opciones": [
+      "Un contenedor virtual para almacenar objetos en la nube",
+      "Una unidad de procesamiento",
+      "Una base de datos temporal",
+      "Un servidor de aplicaciones"
+    ],
+    "respuesta_correcta": 0,
+    "explicacion": "Un bucket en AWS S3 es un contenedor de almacenamiento de objetos en la nube que actúa como el nivel más alto de organización para los archivos almacenados en Amazon S3."
+  },
+  {
+    "pregunta": "¿Cuál es la principal ventaja de usar microservicios?",
+    "opciones": [
+      "Reducir la complejidad general del sistema",
+      "Permitir escalabilidad independiente de componentes",
+      "Eliminar completamente los errores",
+      "Reducir el costo de hardware"
+    ],
+    "respuesta_correcta": 1,
+    "explicacion": "La principal ventaja de los microservicios es permitir que cada componente escale de forma independiente según su carga, lo que es muy diferente a una arquitectura monolítica."
+  },
+  {
+    "pregunta": "¿Qué es el versionado semántico?",
+    "opciones": [
+      "Un sistema de control de versiones como Git",
+      "Un esquema de numeración que indica cambios: MAJOR.MINOR.PATCH",
+      "Una técnica de optimización de código",
+      "Un protocolo de comunicación"
+    ],
+    "respuesta_correcta": 1,
+    "explicacion": "El versionado semántico es un esquema de tres números (MAJOR.MINOR.PATCH) donde MAJOR indica cambios incompatibles, MINOR nuevas funcionalidades compatibles, y PATCH correcciones de errores."
+  }
+]

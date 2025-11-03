@@ -1,0 +1,13 @@
+Flask
+Werkzeug
+Jinja2
+click
+ollama
+PyPDF2
+langchain
+langchain-community
+langchain-core
+langchain-text-splitters
+chromadb
+python-dotenv
+httpx

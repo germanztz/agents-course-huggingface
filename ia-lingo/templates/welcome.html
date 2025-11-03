@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interactivo - Bienvenido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="contenedor">
+        <!-- Pantalla de Inicio -->
+        <div id="pantalla-inicio" class="pantalla-inicio">
+            <div class="encabezado">
+                <h1>🎓 Quiz Interactivo</h1>
+                <p>Pon a prueba tus conocimientos en tecnología</p>
+            </div>
+            
+            <p class="descripcion">
+                Responde preguntas sobre programación y tecnología. 
+                Recibe retroalimentación inmediata con explicaciones detalladas.
+            </p>
+
+            <!-- Botón para comenzar con preguntas por defecto -->
+            <div class="seccion-boton">
+                <button onclick="iniciarQuiz()">Comenzar Quiz</button>
+            </div>
+
+            <!-- Separador -->
+            <div class="separador">
+                <div class="linea-separadora"></div>
+                <div class="linea-separadora-texto">O</div>
+                <div class="linea-separadora"></div>
+            </div>
+
+            <!-- Sección de carga de archivo -->
+            <div class="seccion-archivo">
+                <div class="area-carga" id="areaCarga" onclick="abrirSelector()">
+                    <div class="icono-archivo">📁</div>
+                    <div class="texto-carga">Cargar preguntas personalizadas</div>
+                    <div class="texto-carga-subtitulo">Arrastra un archivo PDF o haz clic aquí</div>
+                </div>
+                <input type="file" id="inputArchivo" accept=".pdf" onchange="manejarSeleccionArchivo(event)">
+                
+                <div class="archivo-seleccionado" id="archivoSeleccionado">
+                    <div>✓ Archivo seleccionado: <span class="nombre-archivo" id="nombreArchivo"></span></div>
+                </div>
+
+                <div class="mensaje-error" id="mensajeError"></div>
+                <div class="mensaje-exito" id="mensajeExito"></div>
+
+                <div class="botones-archivo" id="botonesArchivo" style="display: none;">
+                    <button class="btn-cargar" onclick="cargarArchivo()">Cargar y Comenzar</button>
+                    <button class="btn-cancelar" onclick="cancelarArchivo()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
+    <script src="{{ url_for('static', filename='welcome.js') }}"></script>
+</body>
+</html>
