@@ -288,9 +288,3 @@ def error_servidor(error):
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
-@app.errorhandler(500)
-def error_servidor(error):
-    return jsonify({'error': 'Error interno del servidor'}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
