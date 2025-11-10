@@ -63,9 +63,20 @@ class QuestionList(TypedDict):
 file_dir = lambda f: os.path.dirname(f)
 file_name = lambda f: os.path.basename(f)
 file_prefix = lambda f: os.path.splitext(file_name(f))[0]
-vs_path = lambda f: os.path.join(file_dir(f), file_name(f)+".vs")
+file_ext = lambda f: os.path.splitext(file_name(f))[1]
+vs_path = lambda f: f + ".vs"
+json_path = lambda f: f + ".json"
 
-async def to_vector_store(file_path:str):
+async def split_pdf(file_path:str) -> list[Document]:
+    # Load and split PDF
+    loader = PyPDFLoader(file_path)
+    return loader.load_and_split()
+
+async def split_text(file_path:str, encoding="utf-8") -> list[Document]:
+    with open(file_path, "r", encoding=encoding) as f:
+        return [Document(page_content=f.read(), metadata={"source": file_path, 'page_label':'1'})]
+
+async def to_vector_store(file_path:str, chunk_size=1000, chunk_overlap=200):
     """
     Converts a PDF file into a Chroma vector store.
 
@@ -77,28 +88,24 @@ async def to_vector_store(file_path:str):
     """
     embedding=OllamaEmbeddings(model="nomic-embed-text")
     if os.path.isdir(vs_path(file_path)):
-        return Chroma(persist_directory=vs_path(file_path), collection_name=file_name(file_path), embedding_function=embedding)
-    
-    # Load and split PDF
-    loader = PyPDFLoader(file_path)
-    pages = loader.load_and_split()
-    
-    # Split text into chunks
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
-    chunks = text_splitter.split_documents(pages)
+        return Chroma(persist_directory=vs_path(file_path), collection_name=file_name(file_path).replace(' ','_'), embedding_function=embedding)
+    documents = []
+    match file_ext(file_path).lower():
+        case '.pdf':
+            documents = await split_pdf(file_path=file_path)
+        case '.md' | '.txt':
+            documents = await split_text(file_path=file_path)
 
+    # Split text into chunks
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    
     # Create vector store
-    vectorstore = Chroma.from_documents(
-        documents=chunks,
-        collection_name=file_name(file_path),
+    return Chroma.from_documents(
+        documents=text_splitter.split_documents(documents),
+        collection_name=file_name(file_path).replace(' ','_'),
         embedding=embedding,
         persist_directory=vs_path(file_path)
-    )
-
-    return vectorstore
+        )
 
 async def get_nodes(vectorstore: Chroma) -> List[Document]:
     """Retrieves all documents and their metadata from the Chroma vectorstore.
@@ -121,6 +128,15 @@ async def get_nodes(vectorstore: Chroma) -> List[Document]:
         nodes.append(node)
     return nodes
 
+async def store_questions(sqlitedb:str, questions: List[Dict[str, Any]]) -> None:
+    async with sqlite3.connect(sqlitedb) as conn:
+        # create table questions if dont exists
+        await conn.execute(f"CREATE TABLE IF NOT EXISTS questions (question TEXT, answer TEXT, source TEXT)")
+        for question in questions:
+            await conn.execute(f"INSERT INTO questions (question, answer, source) VALUES (?, ?)",
+                (question["question"], question["answer"], question["source"])
+                )
+
 
 async def process_pdf_with_ollama(file_path: str) -> Tuple[List[Dict[str, Any]], str]:
     """
@@ -135,56 +151,56 @@ async def process_pdf_with_ollama(file_path: str) -> Tuple[List[Dict[str, Any]],
     Raises:
         Exception: Si ocurre un error durante el procesamiento del PDF
     """
-    try:
-        vectorstore = await to_vector_store(file_path)
-        nodes = await get_nodes(vectorstore)
-              
-        llm_model = ChatOllama(model="qwen3")
-        # llm_model = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
-        # llm_model = ChatOpenAI(model="qwen-plus", api_key=os.getenv('DASHSCOPE_API_KEY'), base_url=os.getenv('DASHSCOPE_BASE_URL'))
+    # try:
+    vectorstore = await to_vector_store(file_path)
+    nodes = await get_nodes(vectorstore)
+            
+    llm_model = ChatOllama(model="qwen3")
+    # llm_model = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
+    # llm_model = ChatOpenAI(model="qwen-plus", api_key=os.getenv('DASHSCOPE_API_KEY'), base_url=os.getenv('DASHSCOPE_BASE_URL'))
 
-        # Extract questions using qwen3 model
-        questions = []
-        
-        for i, chunk in enumerate(nodes):
-            try:
-                # response = ollama.chat(model='qwen3', messages=[{'role': 'user', 'content': prompt}])
-                response = await llm_model.with_structured_output(QuestionList).ainvoke([
-                    {'role': 'system', 'content': system_prompt}, 
-                    {'role': 'user', 'content': chunk.page_content}])
-                for question in response['questions']:
-                    question["source"] = f"Page {chunk.metadata["page_label"]}: {chunk.page_content}"
-                    questions.append(question)
+    # Extract questions using qwen3 model
+    questions = []
+    
+    for i, node in enumerate(nodes):
+        try:
+            # response = ollama.chat(model='qwen3', messages=[{'role': 'user', 'content': prompt}])
+            response = await llm_model.with_structured_output(QuestionList).ainvoke([
+                {'role': 'system', 'content': system_prompt}, 
+                {'role': 'user', 'content': node.page_content}])
+            for question in response['questions']:
+                question["source"] = f"Page {node.metadata["page_label"]}: {node.page_content}"
+                questions.append(question)
+                # Save questions to JSON file with PDF name
+                with open(json_path(file_path), 'a', encoding='utf-8') as f:
+                    f.write(",\n")
+                    json.dump(question, f, ensure_ascii=False, indent=2)
 
-                        
-            except Exception as e:
-                print(f"Error processing chunk {i}: {str(e)}")
-                continue
+        except Exception as e:
+            print(f"Error processing node {i}: {str(e)}")
+            continue
+    
+    # If no questions were extracted, return an empty list
+    if len(questions) == 0:
+        print("No questions extracted from PDF")
+        return [], None
+    
+    return questions, json_path(file_path)
         
-        # If no questions were extracted, return an empty list
-        if len(questions) == 0:
-            print("No questions extracted from PDF")
-            return [], None
-        
-        # Save questions to JSON file with PDF name
-        json_path = os.path.join(file_dir(file_path), file_prefix(file_path) + '.json')
-        
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(questions, f, ensure_ascii=False, indent=2)
-        
-        return questions, json_path
-        
-    except Exception as e:
-        print(f"Detailed error: {str(e)}")
-        raise Exception(f"Error processing PDF: {str(e)}")
+    # except Exception as e:
+    #     print(f"Detailed error: {str(e)}")
+    #     raise Exception(f"Error processing File: {str(e)}")
 
 if __name__ == "__main__":
 
     import asyncio
 
     async def main():
+        # print(await process_pdf_with_ollama(
+        #     "/home/daimler/workspaces/agents-course-huggingface/ia-lingo/uploads/test.pdf" ))
         print(await process_pdf_with_ollama(
-            "/home/daimler/workspaces/agents-course-huggingface/ia-lingo/uploads/test.pdf" ))
+            "/home/daimler/workspaces/agents-course-huggingface/tmb resp tecnico.md" ))
+            
         # vs = await to_vector_store("/home/daimler/workspaces/agents-course-huggingface/ia-lingo/uploads/test.pdf" )
         # print(await get_nodes(vs))
 

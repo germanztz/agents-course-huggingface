@@ -1,70 +1,61 @@
-# Aplicación Quiz Interactivo en Python
+# Interactive Quiz App in Python
 
-Una aplicación web de preguntas y respuestas desarrollada con **Python y Flask**. La aplicación presenta preguntas con 4 opciones, valida respuestas en tiempo real, muestra retroalimentación inmediata y proporciona explicaciones detalladas.
+A web application for questions and answers developed with **Python and Flask**. The app presents questions with 4 options, validates answers in real time, provides immediate feedback, and offers detailed explanations.
 
-## Características
+## Features
 
-✅ 8 preguntas de ejemplo sobre programación y tecnología  
-✅ 4 opciones por pregunta  
-✅ Validación de respuestas en el servidor (Python/Flask)  
-✅ Feedback visual inmediato (respuestas correctas/incorrectas)  
-✅ Desaparición animada de respuestas incorrectas 
-✅ Explicaciones detalladas para cada pregunta  
-✅ Sistema de puntuación en tiempo real  
-✅ Pantalla de resultados finales  
-✅ Diseño responsivo (mobile-friendly)  
-✅ Interfaz moderna con gradientes y animaciones  
+✅ 8 example questions on programming and technology  
+✅ 4 options per question  
+✅ Server-side answer validation (Python/Flask)  
+✅ Visual immediate feedback (correct turns green / incorrect selected answer turnd red)  
+✅ Detailed explanations for each question
+✅ Real-time scoring system
+✅ Final results screen
+✅ Responsive design (mobile-friendly)  
+✅ Modern interface with gradients and animations
 
-### 3. Usar el quiz
+### 3. Use the quiz
 
-1. entra a la pantalla welcome
-2. en la pantalla welcome Haz clic en "cargar pdf comenzar" selecciona un pdf, se sube el pdf al servidor i comienza la primera pregunta
-3. en la pantalla welcome Haz clic en "Comenzar" para ir a la primera pregunta
-4. Lee cada pregunta y selecciona una opción
-5. retroalimentacion al usuario si la respuesta es correcta o incorrecta
-6. la respuesta correcta se marca en verde y se ocultan el resto de respuestas
-7. aparece la explicacion justificando la respuesta junto con el boton siguiente
-8. Haz clic en "Siguiente" para continuar con la siguiente pregunta
-9. Durante las preguntas siempre aparece en pantalla estadisticas del juego: pregunta 5 de 10 puntutación: 5
+1. Go to the welcome screen  
+3. On the welcome screen, click "Start" to go to the first question  
+4. Read each question and select an option  
+5. Provide feedback to the user, The correct answer is marked in green, if the answer is incorrect, the selected option turns red  
+7. The explanation justifying the answer appears along with the "Next" button  
+8. Click "Next" to continue to the next question  
+9. During the questions, the game statistics are always displayed on the screen: example Question 5 of 10, Score: 5
 
-
-## Estructura del Proyecto
+## Project Structure
 
 ```
 quiz-app/
 ├── src/
-│   ├── app.py                 # Backend Flask con API REST
-│   ├── questions.py           # Backend generate_questions, get_questions, load_questions, verify_response
-│   └── models/                 # directorio de modelo de datos
-|       └── question.py                 # class que describe una question
-├── test/                 # tests unitarios
-│   └── test_question.py         # tests unitarios para question.py
+│   ├── app.py                 # Flask backend with REST API
+│   ├── questions-controller.py  # Controller for handling requests to generate and retrieve questions, functions: generate_questions, get_questions, load_questions, verify_response
+│   └── models/                 # directory for data models
+|       └── question.py                 # class that describes a question
+├── test/                 # unit tests
+│   └── test_question.py         # unit tests for question.py
 ├── static/
-│   ├── styles.css         # Estilos CSS para la interfaz web
-│   ├── preguntas-ejemplo.json         # Preguntas de ejemplo 
+│   ├── styles.css         # CSS styles for the web interface
 |   └── script.js         # JavaScript
 ├── templates/
-│   ├── welcome.html      # HTML para la pantalla de inicio
-|   └── quiz.html         # HTML para el quiz
-├── uploads/              # Directorio para subir archivos pdf
-├── requirements.txt      # Dependencias Python
-├── DockerFile            # para ejecutar la app en docker
-└── README.md             # README con la descripcion de la estructura, instalacion
+│   ├── welcome.html      # HTML for the welcome screen
+|   └── quiz.html         # HTML for the quiz
+├── data/                 # directory for store app data files
+│   └── example_questions.json         # example questions
+├── requirements.txt      # Python dependencies
+├── DockerFile            # to run the app in Docker
+└── README.md             # README with the description of the structure, installation
 ```
 
 ## Question model
 
 ```
 Question:
-  id: int
-  question: str #the given question
-  answers: list[Answer] # list of possible answers
-  hint: str # clue about the question
-  why: str # explanation why is correct
-
-Answer:
-  answer: str #the given answer
-  is_correct: bool # True si es la respuesta correcta, False si no
+  id: int # unique id 
+  question: str # the given question
+  answer: str # the correct answer
+  source: str # explanation 
 ```
 
 ## Requisitos
